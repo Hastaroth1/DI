@@ -6,6 +6,7 @@ namespace DI.Tests;
 public class ServiceProviderShould
 {
     private interface ISomeService { }
+
     private class SomeService : ISomeService { }
 
     [Fact]
@@ -31,6 +32,7 @@ public class ServiceProviderShould
     {
         public ISomeService AService { get; set; }
     }
+
     private class ServiceWithOneDependency : IServiceWithOneDependency
     {
         public ISomeService AService { get; set; }
@@ -56,6 +58,7 @@ public class ServiceProviderShould
         Assert.IsType<SomeService>(service.AService);
     }
 
+#pragma warning disable IDE0060 // Remove unused parameter
     class A
     {
         public A(B b, C c)
@@ -63,6 +66,7 @@ public class ServiceProviderShould
 
         }
     }
+
     class B
     {
         public B(C c)
@@ -72,6 +76,8 @@ public class ServiceProviderShould
     }
 
     class C { }
+
+#pragma warning restore IDE0060 // Remove unused parameter
 
     [Fact]
     public void ReturnsSingletonWithMultipleParams()

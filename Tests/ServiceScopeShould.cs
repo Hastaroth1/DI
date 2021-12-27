@@ -16,7 +16,9 @@ public class ServiceScopeShould
     }
 
     private interface ISingletonService { };
-    private class SingletonService: ISingletonService { };
+
+    private class SingletonService : ISingletonService { };
+
     [Fact]
     public void HandleSingletonServices()
     {
@@ -31,9 +33,11 @@ public class ServiceScopeShould
     }
 
     private interface IScopedService { };
+
     private class ScopedService : IScopedService { };
+
     [Fact]
-    public void HandlesScopedDependency()
+    public void HandleScopedDependency()
     {
         var provider = new Serviceprovider();
         provider.AddScoped<IScopedService, ScopedService>();
@@ -47,9 +51,11 @@ public class ServiceScopeShould
     }
 
     private interface ITransientService { };
+
     private class TransientService : ITransientService { };
+
     [Fact]
-    public void HandlesTransientDependency()
+    public void HandleTransientDependency()
     {
         var provider = new Serviceprovider();
         provider.AddTransient<ITransientService, TransientService>();
@@ -60,5 +66,69 @@ public class ServiceScopeShould
         var service2 = scope.GetService<ITransientService>();
 
         Assert.NotSame(service, service2);
+    }
+
+#pragma warning disable IDE0060 // Remove unused parameter
+    class A
+    {
+        [ConstructorInjection]
+        public A(B b, C c)
+        {
+        }
+
+        public A(D d) => throw new InvalidOperationException();
+    }
+
+    class B
+    {
+        public B(C c)
+        {
+
+        }
+    }
+#pragma warning restore IDE0060 // Remove unused parameter
+
+    class C { }
+
+    class D { }
+
+    [Fact]
+    public void SelectMarkedConstructors()
+    {
+        var serviceProvider = new Serviceprovider();
+        serviceProvider.AddSingleton<A, A>();
+        serviceProvider.AddSingleton<B, B>();
+        serviceProvider.AddSingleton<C, C>();
+
+        using var scope = serviceProvider.CreateScope();
+
+        var a = scope.GetService<A>();
+    }
+
+#pragma warning disable IDE0060 // Remove unused parameter
+    class E
+    {
+        public E()
+        {
+
+        }
+
+        public E(D d)
+        {
+
+        }
+    }
+#pragma warning restore IDE0060 // Remove unused parameter
+
+    [Fact]
+    public void ThrowIfAmbiguousConstructors()
+    {
+        var serviceProvider = new Serviceprovider();
+        serviceProvider.AddSingleton<E, E>();
+        serviceProvider.AddSingleton<D, D>();
+
+        using var scope = serviceProvider.CreateScope();
+
+        Assert.Throws<ArgumentException>(() => _ = scope.GetService<A>());
     }
 }
