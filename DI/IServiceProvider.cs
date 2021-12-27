@@ -142,7 +142,7 @@ public class Serviceprovider : IServiceProvider
         if (constructors.Length == 1)
         {
             // The type only has one constructor.
-            // Use that one to instanciate the service.
+            // Use that one to instantiate the service.
             constructorInfo = constructors.First();
         }
         else
